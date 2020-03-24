@@ -3,11 +3,17 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
-%matplotlib inline
+import datetime
+
 from ipywidgets import interact, interact_manual
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import random
+r = random.randint(0,255)
+g = random.randint(0,255)
+b = random.randint(0,255)
+rgb = [r,g,b]
 
 app = dash.Dash(__name__)
 server = app.server
@@ -15,21 +21,20 @@ server = app.server
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
 df=pd.read_csv('https://raw.githubusercontent.com/datasets/covid-19/master/data/countries-aggregated.csv',sep=',')
+df=df.reset_index()
+print(df)
 available_indicators=df['Country'].unique()
 
 app.layout = html.Div([
     html.Div([
 
         html.Div([
+            html.P("Select the countries you want to compare"),
             dcc.Dropdown(
                 id='crossfilter-xaxis-column1',
                 options=[{'label': i, 'value': i} for i in available_indicators],
-                #value='Fertility rate, total (births per woman)'
-            ),
-            dcc.Dropdown(
-                id='crossfilter-xaxis-column2',
-                options=[{'label': i, 'value': i} for i in available_indicators],
-                #value='Fertility rate, total (births per woman)'
+
+                multi=True
             ),
         ],
             style={'width': '49%', 'display': 'inline-block'}),
@@ -38,48 +43,98 @@ app.layout = html.Div([
     html.Div([
         dcc.Graph(
             id='crossfilter-indicator-scatter',
+# 'display': 'inline-block'
         )
-    ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}),
+    ], style={'width': '49%', 'padding': '0 20'}),
+
+    html.Div([
+        dcc.Graph(
+            id='crossfilter-indicator-scatter2',
+
+        )
+    ], style={'width': '49%', 'padding': '0 20'}),
 ])
 ])
 
 @app.callback(
     dash.dependencies.Output('crossfilter-indicator-scatter', 'figure'),
-    [dash.dependencies.Input('crossfilter-xaxis-column1', 'value'),
-    dash.dependencies.Input('crossfilter-xaxis-column2', 'value')])
-def update_graph(xaxis_column_name, yaxis_column_name):
-    df1=df[df['Country']==[xaxis_column_name]
-    df2=df[df['Country']==[yaxis_column_name]
+    [dash.dependencies.Input('crossfilter-xaxis-column1', 'value')])
+def update_graph(countries):
+        # filtered_ddf_item_in = ddf_item_in[ddf_item_in['ITEMCODE'].isin(selected_ITEM)]
+    df1=df[df['Country'].isin(countries)]
+    dataTrace=[]
+    for country in df1['Country'].unique():
+        df2=df1[df1['Country']==country]
+        trace = go.Scatter(
+                x=df2['Date'],
+                y=df2['Confirmed'],
+                name=country,
+                mode='lines + markers',
+                opacity=0.6,
+                marker=dict(
+                size=8,
+                symbol='circle',
+                )
+                    )
+
+        dataTrace.append(trace)
 
 
-    return {
-        'data': [go.Scatter(
-            x=df1['Date'],
-            y=df1['Confirmed'],
-            text=df1['Country'],
-            #customdata=dff[dff['Indicator Name'] == yaxis_column_name]['Country Name'],
-            mode='markers',
-            marker={
-                'size': 15,
-                'opacity': 0.5,
-                'line': {'width': 0.5, 'color': 'white'}
-            }
-        )],
-        'layout': go.Layout(
-            xaxis={
-                'title': xaxis_column_name,
-                'type': 'linear' if xaxis_type == 'Linear' else 'log'
-            },
-            yaxis={
-                'title': yaxis_column_name,
-                'type': 'linear' if yaxis_type == 'Linear' else 'log'
-            },
-            margin={'l': 40, 'b': 30, 't': 10, 'r': 0},
-            height=450,
-            hovermode='closest'
+    layout =go.Layout(
+        title='Cumulative Trend Cases' ,
+        autosize= True,
+        hovermode= "closest",
+        scene= dict(
+            xaxis=dict(title='date',showgrid=True, zeroline=False,  ticks='', showticklabels=True, showline=True, linewidth=1, linecolor='orange', mirror=True),
+            yaxis=dict(title='cases',showgrid=True, zeroline=False, ticks='', showticklabels=True, showline=True, linewidth=1, linecolor='orange', mirror=True),
+
+        ),
+        #width=500,
+        #height=500
         )
-    }
+    fig = dict(data=dataTrace, layout=layout)
+    return fig
 
+
+
+@app.callback(
+    dash.dependencies.Output('crossfilter-indicator-scatter2', 'figure'),
+    [dash.dependencies.Input('crossfilter-xaxis-column1', 'value')])
+def update_graph2(countries):
+            # filtered_ddf_item_in = ddf_item_in[ddf_item_in['ITEMCODE'].isin(selected_ITEM)]
+    df1=df[df['Country'].isin(countries)]
+    dataTrace=[]
+    for country in df1['Country'].unique():
+        df2=df1[df1['Country']==country]
+        trace = go.Scatter(
+                    x=df2['Date'],
+                    y=df2['Deaths'],
+                    name=country,
+                    mode='lines + markers',
+                    opacity=0.6,
+                    marker=dict(
+                    size=8,
+                    symbol='circle',
+                    )
+                        )
+
+        dataTrace.append(trace)
+
+
+    layout =go.Layout(
+            title='Cumulative Trend Deaths' ,
+            autosize= True,
+            hovermode= "closest",
+            scene= dict(
+                xaxis=dict(title='date',showgrid=True, zeroline=False,  ticks='', showticklabels=True, showline=True, linewidth=1, linecolor='orange', mirror=True),
+                yaxis=dict(title='deaths',showgrid=True, zeroline=False, ticks='', showticklabels=True, showline=True, linewidth=1, linecolor='orange', mirror=True),
+
+            ),
+            #width=500,
+            #height=500
+            )
+    fig = dict(data=dataTrace, layout=layout)
+    return fig
 
 # def create_time_series(dff, axis_type, title):
 #     return {
