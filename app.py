@@ -45,6 +45,7 @@ app.layout = html.Div([
         )
     ], style={'width': '49%', 'padding': '0 20'}),
 
+
     html.Div([
         dcc.Graph(
             id='crossfilter-indicator-scatter2',
@@ -161,7 +162,7 @@ def update_graph3(regions):
         trace =go.Scattergeo(
             lon = w2['long'],
             lat = w2['lat'],
-            name=region,
+            name=w2['totale_casi'],
             mode = 'markers',
             marker = dict(
             size = w2['totale_casi']/80,
