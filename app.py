@@ -5,7 +5,7 @@ import plotly.graph_objs as go
 import pandas as pd
 import datetime
 
-import matplotlib.pyplot as plt
+
 import numpy as np
 import seaborn as sns
 
