@@ -16,8 +16,12 @@ app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 
 df=pd.read_csv('https://raw.githubusercontent.com/datasets/covid-19/master/data/countries-aggregated.csv',sep=',')
 df=df.reset_index()
-print(df)
 available_indicators=df['Country'].unique()
+
+
+w=pd.read_csv('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province.csv',sep=',')
+available_regions=w['denominazione_regione'].unique()
+
 
 app.layout = html.Div([
     html.Div([
@@ -47,6 +51,17 @@ app.layout = html.Div([
 
         )
     ], style={'width': '49%', 'padding': '0 20'}),
+    html.Div([
+        html.P("Select the countries you want to compare"),
+        dcc.Dropdown(
+            id='crossfilter-xaxis-column3',
+            options=[{'label': i, 'value': i} for i in available_regions],
+
+            multi=True
+        ),
+        dcc.Graph(
+            id='crossfilter-indicator-scatter3',
+        )])
 ])
 ])
 
@@ -130,51 +145,53 @@ def update_graph2(countries):
     fig = dict(data=dataTrace, layout=layout)
     return fig
 
-# def create_time_series(dff, axis_type, title):
-#     return {
-#         'data': [go.Scatter(
-#             x=dff['Year'],
-#             y=dff['Value'],
-#             mode='lines+markers'
-#         )],
-#         'layout': {
-#             'height': 225,
-#             'margin': {'l': 20, 'b': 30, 'r': 10, 't': 10},
-#             'annotations': [{
-#                 'x': 0, 'y': 0.85, 'xanchor': 'left', 'yanchor': 'bottom',
-#                 'xref': 'paper', 'yref': 'paper', 'showarrow': False,
-#                 'align': 'left', 'bgcolor': 'rgba(255, 255, 255, 0.5)',
-#                 'text': title
-#             }],
-#             'yaxis': {'type': 'linear' if axis_type == 'Linear' else 'log'},
-#             'xaxis': {'showgrid': False}
-#         }
-#     }
-#
-#
-# @app.callback(
-#     dash.dependencies.Output('x-time-series', 'figure'),
-#     [dash.dependencies.Input('crossfilter-indicator-scatter', 'hoverData'),
-#      dash.dependencies.Input('crossfilter-xaxis-column', 'value'),
-#      dash.dependencies.Input('crossfilter-xaxis-type', 'value')])
-# def update_y_timeseries(hoverData, xaxis_column_name, axis_type):
-#     country_name = hoverData['points'][0]['customdata']
-#     dff = df[df['Country Name'] == country_name]
-#     dff = dff[dff['Indicator Name'] == xaxis_column_name]
-#     title = '<b>{}</b><br>{}'.format(country_name, xaxis_column_name)
-#     return create_time_series(dff, axis_type, title)
-#
-#
-# @app.callback(
-#     dash.dependencies.Output('y-time-series', 'figure'),
-#     [dash.dependencies.Input('crossfilter-indicator-scatter', 'hoverData'),
-#      dash.dependencies.Input('crossfilter-yaxis-column', 'value'),
-#      dash.dependencies.Input('crossfilter-yaxis-type', 'value')])
-# def update_x_timeseries(hoverData, yaxis_column_name, axis_type):
-#     dff = df[df['Country Name'] == hoverData['points'][0]['customdata']]
-#     dff = dff[dff['Indicator Name'] == yaxis_column_name]
-#     return create_time_series(dff, axis_type, yaxis_column_name)
-#
+
+
+
+
+@app.callback(
+    dash.dependencies.Output('crossfilter-indicator-scatter3', 'figure'),
+    [dash.dependencies.Input('crossfilter-xaxis-column3', 'value')])
+def update_graph3(regions):
+
+    w1=w[w['denominazione_regione'].isin(regions)]
+    dataTrace=[]
+    for region in w1['denominazione_regione'].unique():
+        w2=w1[w1['denominazione_regione']==region]
+        trace =go.Scattergeo(
+            lon = w2['long'],
+            lat = w2['lat'],
+            name=region,
+            mode = 'markers',
+            marker = dict(
+            size = w2['totale_casi']/80,
+            opacity = 0.8,
+            reversescale = True,
+            autocolorscale = False,
+            )
+        )
+
+        dataTrace.append(trace)
+
+    layout =go.Layout(
+            title = 'Italy map Contagion',
+            geo = dict(
+            scope='europe',
+            projection_type='natural earth',
+            showland = True,
+            landcolor = 'rgb(115, 115, 115)',
+            subunitcolor = "rgb(217, 217, 217)",
+            countrycolor = "rgb(150, 150, 150)",
+            countrywidth = 0.5,
+            subunitwidth = 0.5,
+        ),
+            width=1000,
+            height=800
+    )
+    fig = dict(data=dataTrace, layout=layout)
+    return fig
+
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
