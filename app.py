@@ -7,7 +7,6 @@ import datetime
 
 
 import numpy as np
-import seaborn as sns
 
 
 app = dash.Dash(__name__)
