@@ -5,15 +5,10 @@ import plotly.graph_objs as go
 import pandas as pd
 import datetime
 
-from ipywidgets import interact, interact_manual
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import random
-r = random.randint(0,255)
-g = random.randint(0,255)
-b = random.randint(0,255)
-rgb = [r,g,b]
+
 
 app = dash.Dash(__name__)
 server = app.server
