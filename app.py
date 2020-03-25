@@ -71,9 +71,12 @@ app.layout = html.Div([
         ),
         dcc.Graph(
             id='crossfilter-indicator-scatter3',
-        )
-
+        ),
+        html.Hr(),
+        html.P('Double tap on the graph if you have got too much zoom!'),
+        html.Hr(),
         ], style={'width': '65%', 'padding': '0 20'}),
+
 
 ])
 ])
