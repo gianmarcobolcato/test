@@ -20,7 +20,6 @@ nbformat==4.4.0
 numpy==1.14.0
 pandas==0.22.0
 plotly==2.3.0
-plotly_express
 python-dateutil==2.6.1
 pytz==2018.3
 requests==2.20.0
