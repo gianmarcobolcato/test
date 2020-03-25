@@ -44,7 +44,7 @@ app.layout = html.Div([
             id='crossfilter-indicator-scatter',
 # 'display': 'inline-block'
         )
-    ], style={'width': '49%', 'padding': '0 20'}),
+    ], style={'width': '55%', 'padding': '0 20'}),
         html.Hr(),
         html.Div(id="number-out"),
         html.Hr(),
@@ -54,7 +54,7 @@ app.layout = html.Div([
             id='crossfilter-indicator-scatter2',
 
         )
-    ], style={'width': '49%', 'padding': '0 20'}),
+    ], style={'width': '55%', 'padding': '0 20'}),
     html.Hr(),
     html.Div([html.H1('Italy contagion recap'),
         html.P("Select the italian regions you want to compare"),
@@ -66,7 +66,12 @@ app.layout = html.Div([
         ),
         dcc.Graph(
             id='crossfilter-indicator-scatter3',
-        )])
+        )
+
+        ], style={'width': '55%', 'padding': '0 20'}),
+        html.Hr(),
+        html.Div(id="number-out2"),
+        html.Hr(),
 ])
 ])
 
@@ -188,14 +193,12 @@ def update_graph3(regions):
 
     w1=w[w['denominazione_regione'].isin(regions)]
     dataTrace=[]
-    print(w1)
     for region in w1['denominazione_regione'].unique():
         w2=w1[w1['denominazione_regione']==region]
         trace =go.Bar(
             x = w2['data'],
             y = w2['totale_casi'],
             name=region,
-
         )
 
         dataTrace.append(trace)
@@ -214,6 +217,25 @@ def update_graph3(regions):
             )
     fig = dict(data=dataTrace, layout=layout)
     return fig
+
+
+
+# @app.callback(
+#     dash.dependencies.Output('number-out2', 'children'),
+#     [dash.dependencies.Input('crossfilter-xaxis-column3', 'value')])
+# def update_graph(regions):
+#
+#     w1=w[w['denominazione_regione'].isin(regions)]
+#     dataTrace=[]
+#     for region in w1['denominazione_regione'].unique():
+#         w2=w1[w1['denominazione_regione']==region]
+#         print(w2)
+#         summary='[There are {} cases in {}'.format(cases,region)
+#         dataTrace.append(summary)
+#
+#     return dataTrace
+
+
 
 
 
