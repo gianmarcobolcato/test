@@ -3,7 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
-
+import plotly.express as px
 
 
 import numpy as np
@@ -30,7 +30,7 @@ app.layout = html.Div([
             html.H1('World contagion recap'),
             html.P("Select the countries you want to compare"),
             dcc.Dropdown(
-                id='crossfilter-xaxis-column1',
+                id='world_dropdown',
                 options=[{'label': i, 'value': i} for i in available_indicators],
 
                 multi=True
@@ -41,20 +41,20 @@ app.layout = html.Div([
 
     html.Div([
         dcc.Graph(
-            id='crossfilter-indicator-scatter',
+            id='world_cases',
 # 'display': 'inline-block'
         )
     ],style={'width': '70%', 'padding': '0 20'}),
 
         html.Div([
         html.Hr(),
-        html.Div(id="number-out"),
+        html.Div(id="world_data"),
         html.Hr(),
         ],
         style={'width': '60%', 'padding': '0 20'}),
     html.Div([
         dcc.Graph(
-            id='crossfilter-indicator-scatter2',
+            id='world_deaths',
 
         )
     ], style={'width': '70%', 'padding': '0 20'}),
@@ -64,13 +64,18 @@ app.layout = html.Div([
     html.H1('Italy contagion recap'),
         html.P("Select the italian regions you want to compare"),
         dcc.Dropdown(
-            id='crossfilter-xaxis-column3',
+            id='italy_dropdown',
             options=[{'label': i, 'value': i} for i in available_regions],
 
             multi=True
         ),
         dcc.Graph(
-            id='crossfilter-indicator-scatter3',
+            id='italy_cases',
+        ),
+        html.Hr(),
+        html.P("             Contagion Map       "),
+        dcc.Graph(
+            id='italy_map',
         ),
         html.Hr(),
         html.P('Double tap on the graph if you have got too much zoom!'),
@@ -82,8 +87,8 @@ app.layout = html.Div([
 ])
 
 @app.callback(
-    dash.dependencies.Output('crossfilter-indicator-scatter', 'figure'),
-    [dash.dependencies.Input('crossfilter-xaxis-column1', 'value')])
+    dash.dependencies.Output('world_cases', 'figure'),
+    [dash.dependencies.Input('world_dropdown', 'value')])
 def update_graph(countries):
         # filtered_ddf_item_in = ddf_item_in[ddf_item_in['ITEMCODE'].isin(selected_ITEM)]
     df1=df[df['Country'].isin(countries)]
@@ -123,8 +128,8 @@ def update_graph(countries):
 
 
 @app.callback(
-    dash.dependencies.Output('number-out', 'children'),
-    [dash.dependencies.Input('crossfilter-xaxis-column1', 'value')])
+    dash.dependencies.Output('world_data', 'children'),
+    [dash.dependencies.Input('world_dropdown', 'value')])
 def update_graph(countries):
 
     df1=df[df['Country'].isin(countries)]
@@ -149,8 +154,8 @@ def update_graph(countries):
 
 
 @app.callback(
-    dash.dependencies.Output('crossfilter-indicator-scatter2', 'figure'),
-    [dash.dependencies.Input('crossfilter-xaxis-column1', 'value')])
+    dash.dependencies.Output('world_deaths', 'figure'),
+    [dash.dependencies.Input('world_dropdown', 'value')])
 def update_graph2(countries):
             # filtered_ddf_item_in = ddf_item_in[ddf_item_in['ITEMCODE'].isin(selected_ITEM)]
     df1=df[df['Country'].isin(countries)]
@@ -189,11 +194,9 @@ def update_graph2(countries):
 
 
 
-
-
 @app.callback(
-    dash.dependencies.Output('crossfilter-indicator-scatter3', 'figure'),
-    [dash.dependencies.Input('crossfilter-xaxis-column3', 'value')])
+    dash.dependencies.Output('italy_cases', 'figure'),
+    [dash.dependencies.Input('italy_dropdown', 'value')])
 def update_graph3(regions):
 
     w1=w[w['denominazione_regione'].isin(regions)]
@@ -240,6 +243,17 @@ def update_graph3(regions):
 #
 #     return dataTrace
 
+@app.callback(
+    dash.dependencies.Output('italy_map', 'figure'),
+    [dash.dependencies.Input('italy_dropdown', 'value')])
+def update_map(value):
+    print(w)
+    fig = px.scatter_mapbox(w, lat="lat", lon="long", hover_name="denominazione_provincia",size="totale_casi",
+                            color_discrete_sequence=["fuchsia"], zoom=3, height=500)
+
+    fig.update_layout(mapbox_style="open-street-map")
+    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    return fig
 
 
 
