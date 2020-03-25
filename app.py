@@ -3,7 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
-import plotly.express as px
+# import plotly.express as px
 
 
 import numpy as np
@@ -72,11 +72,11 @@ app.layout = html.Div([
         dcc.Graph(
             id='italy_cases',
         ),
-        html.Hr(),
-        html.P("             Contagion Map       "),
-        dcc.Graph(
-            id='italy_map',
-        ),
+        # html.Hr(),
+        # html.P("             Contagion Map       "),
+        # dcc.Graph(
+        #     id='italy_map',
+        # ),
         html.Hr(),
         html.P('Double tap on the graph if you have got too much zoom!'),
         html.Hr(),
@@ -243,17 +243,17 @@ def update_graph3(regions):
 #
 #     return dataTrace
 
-@app.callback(
-    dash.dependencies.Output('italy_map', 'figure'),
-    [dash.dependencies.Input('italy_dropdown', 'value')])
-def update_map(value):
-    print(w)
-    fig = px.scatter_mapbox(w, lat="lat", lon="long", hover_name="denominazione_provincia",size="totale_casi",
-                            color_discrete_sequence=["fuchsia"], zoom=3, height=500)
-
-    fig.update_layout(mapbox_style="open-street-map")
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-    return fig
+# @app.callback(
+#     dash.dependencies.Output('italy_map', 'figure'),
+#     [dash.dependencies.Input('italy_dropdown', 'value')])
+# def update_map(value):
+#     print(w)
+#     fig = px.scatter_mapbox(w, lat="lat", lon="long", hover_name="denominazione_provincia",size="totale_casi",
+#                             color_discrete_sequence=["fuchsia"], zoom=3, height=500)
+#
+#     fig.update_layout(mapbox_style="open-street-map")
+#     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+#     return fig
 
 
 
