@@ -44,19 +44,24 @@ app.layout = html.Div([
             id='crossfilter-indicator-scatter',
 # 'display': 'inline-block'
         )
-    ], style={'width': '70%', 'padding': '0 20'}),
+    ],style={'width': '70%', 'padding': '0 20'}),
+
+        html.Div([
         html.Hr(),
         html.Div(id="number-out"),
         html.Hr(),
-
+        ],
+        style={'width': '60%', 'padding': '0 20'}),
     html.Div([
         dcc.Graph(
             id='crossfilter-indicator-scatter2',
 
         )
     ], style={'width': '70%', 'padding': '0 20'}),
+
+    html.Div([
     html.Hr(),
-    html.Div([html.H1('Italy contagion recap'),
+    html.H1('Italy contagion recap'),
         html.P("Select the italian regions you want to compare"),
         dcc.Dropdown(
             id='crossfilter-xaxis-column3',
@@ -68,10 +73,8 @@ app.layout = html.Div([
             id='crossfilter-indicator-scatter3',
         )
 
-        ], style={'width': '70%', 'padding': '0 20'}),
-        html.Hr(),
-        html.Div(id="number-out2"),
-        html.Hr(),
+        ], style={'width': '65%', 'padding': '0 20'}),
+
 ])
 ])
 
@@ -126,7 +129,7 @@ def update_graph(countries):
 
     for country in df1['Country'].unique():
         df2=df1[df1['Country']==country]
-        print(df2)
+
         cases=df2['Confirmed'].max()
         deaths=df2['Deaths'].max()
         death_rate=deaths/cases*100
