@@ -36,7 +36,7 @@ app.layout = html.Div([
                 multi=True
             ),
         ],
-            style={'width': '49%', 'display': 'inline-block'}),
+            style={'width': '60%', 'display': 'inline-block'}),
 
 
     html.Div([
@@ -44,7 +44,7 @@ app.layout = html.Div([
             id='crossfilter-indicator-scatter',
 # 'display': 'inline-block'
         )
-    ], style={'width': '55%', 'padding': '0 20'}),
+    ], style={'width': '70%', 'padding': '0 20'}),
         html.Hr(),
         html.Div(id="number-out"),
         html.Hr(),
@@ -54,7 +54,7 @@ app.layout = html.Div([
             id='crossfilter-indicator-scatter2',
 
         )
-    ], style={'width': '55%', 'padding': '0 20'}),
+    ], style={'width': '70%', 'padding': '0 20'}),
     html.Hr(),
     html.Div([html.H1('Italy contagion recap'),
         html.P("Select the italian regions you want to compare"),
@@ -68,7 +68,7 @@ app.layout = html.Div([
             id='crossfilter-indicator-scatter3',
         )
 
-        ], style={'width': '55%', 'padding': '0 20'}),
+        ], style={'width': '70%', 'padding': '0 20'}),
         html.Hr(),
         html.Div(id="number-out2"),
         html.Hr(),
@@ -89,7 +89,6 @@ def update_graph(countries):
                 y=df2['Confirmed'],
                 name=country,
                 mode='lines + markers',
-                opacity=0.6,
                 marker=dict(
                 size=8,
                 symbol='circle',
@@ -157,7 +156,7 @@ def update_graph2(countries):
                     y=df2['Deaths'],
                     name=country,
                     mode='lines + markers',
-                    opacity=0.6,
+
                     marker=dict(
                     size=8,
                     symbol='circle',
