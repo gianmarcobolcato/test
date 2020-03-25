@@ -3,7 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import pandas as pd
-import datetime
+
 
 
 import numpy as np
@@ -15,7 +15,6 @@ server = app.server
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
 df=pd.read_csv('https://raw.githubusercontent.com/datasets/covid-19/master/data/countries-aggregated.csv',sep=',')
-df=df.reset_index()
 available_indicators=df['Country'].unique()
 
 
@@ -44,7 +43,9 @@ app.layout = html.Div([
 # 'display': 'inline-block'
         )
     ], style={'width': '49%', 'padding': '0 20'}),
-
+        html.Hr(),
+        html.Div(id="number-out"),
+        html.Hr(),
 
     html.Div([
         dcc.Graph(
@@ -107,6 +108,33 @@ def update_graph(countries):
 
 
 
+
+@app.callback(
+    dash.dependencies.Output('number-out', 'children'),
+    [dash.dependencies.Input('crossfilter-xaxis-column1', 'value')])
+def update_graph(countries):
+
+    df1=df[df['Country'].isin(countries)]
+    dataTrace=[]
+
+    for country in df1['Country'].unique():
+        df2=df1[df1['Country']==country]
+        print(df2)
+        cases=df2['Confirmed'].max()
+        deaths=df2['Deaths'].max()
+        death_rate=deaths/cases*100
+        summary='[There are {} cases and {} deaths in {}, death_rate= {:.2f}% ]'.format(cases,deaths,country,death_rate)
+        dataTrace.append(summary)
+
+    return dataTrace
+
+
+
+
+
+
+
+
 @app.callback(
     dash.dependencies.Output('crossfilter-indicator-scatter2', 'figure'),
     [dash.dependencies.Input('crossfilter-xaxis-column1', 'value')])
@@ -162,10 +190,10 @@ def update_graph3(regions):
         trace =go.Scattergeo(
             lon = w2['long'],
             lat = w2['lat'],
-            name=w2['totale_casi'],
+            name=region,
             mode = 'markers',
             marker = dict(
-            size = w2['totale_casi']/80,
+            size = w2['totale_casi']/100,
             opacity = 0.8,
             reversescale = True,
             autocolorscale = False,
