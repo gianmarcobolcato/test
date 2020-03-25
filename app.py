@@ -25,7 +25,9 @@ available_regions=w['denominazione_regione'].unique()
 app.layout = html.Div([
     html.Div([
 
-        html.Div([
+        html.Div([html.P("Hi DISHUNTER! These Graphs will help you to understand how COVID19 is spreading! Enjoy! "),
+            html.Hr(),
+            html.H1('World contagion recap'),
             html.P("Select the countries you want to compare"),
             dcc.Dropdown(
                 id='crossfilter-xaxis-column1',
@@ -53,8 +55,9 @@ app.layout = html.Div([
 
         )
     ], style={'width': '49%', 'padding': '0 20'}),
-    html.Div([
-        html.P("Select the countries you want to compare"),
+    html.Hr(),
+    html.Div([html.H1('Italy contagion recap'),
+        html.P("Select the italian regions you want to compare"),
         dcc.Dropdown(
             id='crossfilter-xaxis-column3',
             options=[{'label': i, 'value': i} for i in available_regions],
@@ -185,38 +188,30 @@ def update_graph3(regions):
 
     w1=w[w['denominazione_regione'].isin(regions)]
     dataTrace=[]
+    print(w1)
     for region in w1['denominazione_regione'].unique():
         w2=w1[w1['denominazione_regione']==region]
-        trace =go.Scattergeo(
-            lon = w2['long'],
-            lat = w2['lat'],
+        trace =go.Bar(
+            x = w2['data'],
+            y = w2['totale_casi'],
             name=region,
-            mode = 'markers',
-            marker = dict(
-            size = w2['totale_casi']/100,
-            opacity = 0.8,
-            reversescale = True,
-            autocolorscale = False,
-            )
+
         )
 
         dataTrace.append(trace)
 
     layout =go.Layout(
-            title = 'Italy map Contagion',
-            geo = dict(
-            scope='europe',
-            projection_type='natural earth',
-            showland = True,
-            landcolor = 'rgb(115, 115, 115)',
-            subunitcolor = "rgb(217, 217, 217)",
-            countrycolor = "rgb(150, 150, 150)",
-            countrywidth = 0.5,
-            subunitwidth = 0.5,
-        ),
-            width=1000,
-            height=800
-    )
+            title='Covid19 cases by region (Italy)' ,
+            autosize= True,
+            hovermode= "closest",
+            scene= dict(
+                xaxis=dict(title='date',showgrid=True, zeroline=False,  ticks='', showticklabels=True, showline=True, linewidth=1, linecolor='orange', mirror=True),
+                yaxis=dict(title='cases',showgrid=True, zeroline=False, ticks='', showticklabels=True, showline=True, linewidth=1, linecolor='orange', mirror=True),
+
+            ),
+            #width=500,
+            #height=500
+            )
     fig = dict(data=dataTrace, layout=layout)
     return fig
 
