@@ -72,11 +72,12 @@ app.layout = html.Div([
         dcc.Graph(
             id='italy_cases',
         ),
-        # html.Hr(),
-        # html.P("             Contagion Map       "),
-        # dcc.Graph(
-        #     id='italy_map',
-        # ),
+        html.Hr(),
+        html.P("             Contagion Map       "),
+
+        dcc.Graph(
+            id='italy_map',
+        ),
         html.Hr(),
         html.P('Double tap on the graph if you have got too much zoom!'),
         html.Hr(),
@@ -243,18 +244,18 @@ def update_graph3(regions):
 #
 #     return dataTrace
 
-# @app.callback(
-#     dash.dependencies.Output('italy_map', 'figure'),
-#     [dash.dependencies.Input('italy_dropdown', 'value')])
-# def update_map(value):
-#     print(w)
-#     fig = px.scatter_mapbox(w, lat="lat", lon="long", hover_name="denominazione_provincia",size="totale_casi",
-#                             color_discrete_sequence=["fuchsia"], zoom=3, height=500)
-#
-#     fig.update_layout(mapbox_style="open-street-map")
-#     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-#     return fig
+@app.callback(
+    dash.dependencies.Output('italy_map', 'figure'),
+    [dash.dependencies.Input('italy_dropdown', 'value')])
+def update_map(value):
+    print(w)
+    trace1 = [go.Scattermapbox(lat = w['lat'],lon = w['long'], mode='markers', text=w['denominazione_provincia'],
+                               marker={'size': w['totale_casi']/100,'opacity': 0.5,"color": "#FF0000"})]
+    layout1 = go.Layout(title='', autosize=True, hovermode='closest', showlegend=False, height=750,
+                          mapbox={"style": 'open-street-map','center': {'lat': 41, 'lon': 12}, 'zoom': 4.5,})
 
+
+    return {"data": trace1, "layout": layout1}
 
 
 
