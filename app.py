@@ -22,13 +22,28 @@ w=pd.read_csv('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-pr
 available_regions=w['denominazione_regione'].unique()
 
 
+
+
+trace1 = [dict(type='scattergeo',
+                lon = w['long'],
+                lat = w['lat'],
+                text=w['denominazione_provincia'],
+                mode='markers',
+                marker=dict(size= w['totale_casi']/100))]
+layout1 = dict(title='',height=800,width=1000, geo=dict(scope='europe',zoom=10,showland=True))
+fig=dict(data=trace1,layout=layout1)
+
+
+
+
+
 app.layout = html.Div([
     html.Div([
 
-        html.Div([html.P("Hi DISHUNTER! These Graphs will help you to understand how COVID19 is spreading! Enjoy! "),
+        html.Div([html.P("Hi DISHUNTER! Questi grafici ti aiuteranno a capire come si sta espandendo Covid-19! Divertiti! "),
             html.Hr(),
-            html.H1('World contagion recap'),
-            html.P("Select the countries you want to compare"),
+            html.H1('World Contagion Recap'),
+            html.P("Seleziona i Paesi che vuoi confrontare!"),
             dcc.Dropdown(
                 id='world_dropdown',
                 options=[{'label': i, 'value': i} for i in available_indicators],
@@ -61,8 +76,8 @@ app.layout = html.Div([
 
     html.Div([
     html.Hr(),
-    html.H1('Italy contagion recap'),
-        html.P("Select the italian regions you want to compare"),
+    html.H1('Italy Contagion Recap'),
+        html.P("Seleziona le Regioni che vuoi confrontare!"),
         dcc.Dropdown(
             id='italy_dropdown',
             options=[{'label': i, 'value': i} for i in available_regions],
@@ -73,13 +88,13 @@ app.layout = html.Div([
             id='italy_cases',
         ),
         html.Hr(),
-        html.P("             Contagion Map       "),
+        html.P("             Contagion Map (fai zoom sulla tua regione!)       "),
 
         dcc.Graph(
-            id='italy_map',
+            id='italy_map',figure=fig
         ),
         html.Hr(),
-        html.P('Double tap on the graph if you have got too much zoom!'),
+        html.P('Fai Double tap sul grafico se hai zoomato troppo (Si, proprio come quando metti mi piace su instagram)'),
         html.Hr(),
         ], style={'width': '65%', 'padding': '0 20'}),
 
@@ -142,7 +157,7 @@ def update_graph(countries):
         cases=df2['Confirmed'].max()
         deaths=df2['Deaths'].max()
         death_rate=deaths/cases*100
-        summary='[There are {} cases and {} deaths in {}, death_rate= {:.2f}% ]'.format(cases,deaths,country,death_rate)
+        summary='[Ci sono {} casi e {} morti in {}, tasso di morte= {:.2f}% ]'.format(cases,deaths,country,death_rate)
         dataTrace.append(summary)
 
     return dataTrace
@@ -244,18 +259,18 @@ def update_graph3(regions):
 #
 #     return dataTrace
 
-@app.callback(
-    dash.dependencies.Output('italy_map', 'figure'),
-    [dash.dependencies.Input('italy_dropdown', 'value')])
-def update_map(value):
-    print(w)
-    trace1 = [go.Scattermapbox(lat = w['lat'],lon = w['long'], mode='markers', text=w['denominazione_provincia'],
-                               marker={'size': w['totale_casi']/100,'opacity': 0.5,"color": "#FF0000"})]
-    layout1 = go.Layout(title='', autosize=True, hovermode='closest', showlegend=False, height=750,
-                          mapbox={"style": 'open-street-map','center': {'lat': 41, 'lon': 12}, 'zoom': 4.5,})
-
-
-    return {"data": trace1, "layout": layout1}
+# @app.callback(
+#     dash.dependencies.Output('italy_map', 'figure'),
+#     [dash.dependencies.Input('italy_dropdown', 'value')])
+# def update_map(value):
+#     print(w)
+#     trace1 = [go.Scattermapbox(lat = w['lat'],lon = w['long'], mode='markers', text=w['denominazione_provincia'],
+#                                marker={'size': w['totale_casi']/100,'opacity': 0.5,"color": "#FF0000"})]
+#     layout1 = go.Layout(title='', autosize=True, hovermode='closest', showlegend=False, height=750,
+#                           mapbox={"style": 'open-street-map','center': {'lat': 41, 'lon': 12}, 'zoom': 4.5,})
+#
+#
+#     return {"data": trace1, "layout": layout1}
 
 
 
