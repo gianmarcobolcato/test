@@ -28,7 +28,7 @@ available_regions=w['denominazione_regione'].unique()
 
 
 
-# scattergeo
+
 trace1 = [dict(type='scattermapbox',
                 lon = w['long'],
                 lat = w['lat'],
@@ -40,20 +40,10 @@ trace1 = [dict(type='scattermapbox',
                 opacity = 0.4,
                 reversescale = True,
                 autocolorscale = False,
-                line = dict(
-                width=1,
-                color='rgba(102, 102, 102)'
-                ),
-                # colorscale = 'Red',
-                # cmin = 0,
-                # color =  w['totale_casi'],
-                # cmax =  w['totale_casi'].max(),
-                # colorbar_title="Casi Confermati"
                 ))]
-layout1 = dict(title='Contagion Map (fai zoom sulla tua regione!)',height=800,width=1000, mapbox=dict(style='open-street-map',zoom=5,
+layout1 = dict(title='Contagion Map (fai zoom sulla tua regione!)',height=800,width=800, mapbox=dict(style='open-street-map',zoom=5,
                             center=dict(lat=42,lon=12),
-                            ),
-                            geo=dict(scope='europe',zoom=10,showland=True))
+                            ))
 fig=dict(data=trace1,layout=layout1)
 
 
@@ -120,7 +110,7 @@ app.layout = html.Div([
         html.Hr(),
         html.P('Fai Double tap sul grafico se hai zoomato troppo (Si, proprio come quando metti mi piace su instagram)'),
         html.Hr(),
-        ], style={'width': '65%', 'padding': '0 20'}),
+        ], style={'width': '70%', 'padding': '0 20'}),
 
 
 ])
@@ -242,7 +232,6 @@ def update_graph3(regions):
     dataTrace=[]
     for region in w1['denominazione_regione'].unique():
         w2=w1[w1['denominazione_regione']==region]
-        print(w2)
         trace =go.Bar(
             x = w2['data'],
             y = w2['totale_casi'],
