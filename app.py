@@ -15,7 +15,11 @@ server = app.server
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
 df=pd.read_csv('https://raw.githubusercontent.com/datasets/covid-19/master/data/countries-aggregated.csv',sep=',')
+df=df.drop(8781)
 available_indicators=df['Country'].unique()
+
+
+
 
 
 w=pd.read_csv('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province.csv',sep=',')
@@ -24,13 +28,32 @@ available_regions=w['denominazione_regione'].unique()
 
 
 
-trace1 = [dict(type='scattergeo',
+# scattergeo
+trace1 = [dict(type='scattermapbox',
                 lon = w['long'],
                 lat = w['lat'],
-                text=w['denominazione_provincia'],
+                text=w['totale_casi'],
                 mode='markers',
-                marker=dict(size= w['totale_casi']/100))]
-layout1 = dict(title='',height=800,width=1000, geo=dict(scope='europe',zoom=10,showland=True))
+                marker = dict(
+                size =w['totale_casi']/100,
+                color='Red',
+                opacity = 0.4,
+                reversescale = True,
+                autocolorscale = False,
+                line = dict(
+                width=1,
+                color='rgba(102, 102, 102)'
+                ),
+                # colorscale = 'Red',
+                # cmin = 0,
+                # color =  w['totale_casi'],
+                # cmax =  w['totale_casi'].max(),
+                # colorbar_title="Casi Confermati"
+                ))]
+layout1 = dict(title='Contagion Map (fai zoom sulla tua regione!)',height=800,width=1000, mapbox=dict(style='open-street-map',zoom=5,
+                            center=dict(lat=42,lon=12),
+                            ),
+                            geo=dict(scope='europe',zoom=10,showland=True))
 fig=dict(data=trace1,layout=layout1)
 
 
@@ -88,7 +111,8 @@ app.layout = html.Div([
             id='italy_cases',
         ),
         html.Hr(),
-        html.P("             Contagion Map (fai zoom sulla tua regione!)       "),
+        html.Div(id="italy_data"),
+        html.Hr(),
 
         dcc.Graph(
             id='italy_map',figure=fig
@@ -111,13 +135,14 @@ def update_graph(countries):
     dataTrace=[]
     for country in df1['Country'].unique():
         df2=df1[df1['Country']==country]
+
         trace = go.Scatter(
                 x=df2['Date'],
                 y=df2['Confirmed'],
                 name=country,
                 mode='lines + markers',
                 marker=dict(
-                size=8,
+                size=10,
                 symbol='circle',
                 )
                     )
@@ -150,10 +175,8 @@ def update_graph(countries):
 
     df1=df[df['Country'].isin(countries)]
     dataTrace=[]
-
     for country in df1['Country'].unique():
         df2=df1[df1['Country']==country]
-
         cases=df2['Confirmed'].max()
         deaths=df2['Deaths'].max()
         death_rate=deaths/cases*100
@@ -185,7 +208,7 @@ def update_graph2(countries):
                     mode='lines + markers',
 
                     marker=dict(
-                    size=8,
+                    size=10,
                     symbol='circle',
                     )
                         )
@@ -219,6 +242,7 @@ def update_graph3(regions):
     dataTrace=[]
     for region in w1['denominazione_regione'].unique():
         w2=w1[w1['denominazione_regione']==region]
+        print(w2)
         trace =go.Bar(
             x = w2['data'],
             y = w2['totale_casi'],
@@ -244,33 +268,20 @@ def update_graph3(regions):
 
 
 
-# @app.callback(
-#     dash.dependencies.Output('number-out2', 'children'),
-#     [dash.dependencies.Input('crossfilter-xaxis-column3', 'value')])
-# def update_graph(regions):
-#
-#     w1=w[w['denominazione_regione'].isin(regions)]
-#     dataTrace=[]
-#     for region in w1['denominazione_regione'].unique():
-#         w2=w1[w1['denominazione_regione']==region]
-#         print(w2)
-#         summary='[There are {} cases in {}'.format(cases,region)
-#         dataTrace.append(summary)
-#
-#     return dataTrace
+@app.callback(
+    dash.dependencies.Output('italy_data', 'children'),
+    [dash.dependencies.Input('italy_dropdown', 'value')])
+def update_italy_data(regions):
 
-# @app.callback(
-#     dash.dependencies.Output('italy_map', 'figure'),
-#     [dash.dependencies.Input('italy_dropdown', 'value')])
-# def update_map(value):
-#     print(w)
-#     trace1 = [go.Scattermapbox(lat = w['lat'],lon = w['long'], mode='markers', text=w['denominazione_provincia'],
-#                                marker={'size': w['totale_casi']/100,'opacity': 0.5,"color": "#FF0000"})]
-#     layout1 = go.Layout(title='', autosize=True, hovermode='closest', showlegend=False, height=750,
-#                           mapbox={"style": 'open-street-map','center': {'lat': 41, 'lon': 12}, 'zoom': 4.5,})
-#
-#
-#     return {"data": trace1, "layout": layout1}
+    w1=w[w['denominazione_regione'].isin(regions)]
+    dataTrace=[]
+    for region in w1['denominazione_regione'].unique():
+        w2=w1[w1['denominazione_regione']==region]
+        cases=w2.iloc[-2,9]
+        summary='[Ci sono: {} casi in {} ]'.format(cases,region)
+        dataTrace.append(summary)
+
+    return dataTrace
 
 
 
